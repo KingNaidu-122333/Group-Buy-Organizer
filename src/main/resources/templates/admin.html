@@ -56,6 +56,33 @@
             </table>
         </div>
     </section>
+    <section class="listing">
+        <div class="section-head">
+            <p class="eyebrow">Financial activity</p>
+            <h2>Verified payment history</h2>
+            <p>Payments recorded after Stripe session verification or a signed webhook.</p>
+        </div>
+        <div class="table-card" th:if="${!#lists.isEmpty(payments)}">
+            <div class="table-scroll">
+                <table>
+                    <thead><tr><th>Deal</th><th>Member</th><th>Amount</th><th>Currency</th><th>Paid at</th><th>Status</th></tr></thead>
+                    <tbody>
+                    <tr th:each="payment : ${payments}">
+                        <td th:text="${payment.groupBuy.title}">Deal</td>
+                        <td th:text="${payment.user.username}">Member</td>
+                        <td th:text="${#numbers.formatDecimal(payment.amountTotal / 100.0, 1, 2)}">0.00</td>
+                        <td th:text="${#strings.toUpperCase(payment.currency)}">USD</td>
+                        <td th:text="${#temporals.format(payment.paidAt, 'dd MMM yyyy HH:mm')}">Date</td>
+                        <td><span class="badge" th:text="${payment.status}">PAID</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="empty-state" th:if="${#lists.isEmpty(payments)}">
+            <p>No verified payments have been recorded yet.</p>
+        </div>
+    </section>
 </main>
 </body>
 </html>
