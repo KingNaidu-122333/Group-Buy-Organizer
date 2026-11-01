@@ -35,7 +35,7 @@ public class PaymentService {
 
     @Transactional(readOnly = true)
     public List<Payment> getPaymentHistory() {
-        return paymentRepository.findAllByOrderByPaidAtDesc();
+        return paymentRepository.findPaymentHistoryWithDetails();
     }
 
     @Transactional(readOnly = true)
