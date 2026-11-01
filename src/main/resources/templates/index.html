@@ -18,7 +18,7 @@
             <a sec:authorize="isAuthenticated()" th:href="@{/my-deals}">My deals</a>
             <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}">Admin</a>
             <span sec:authorize="isAuthenticated()" class="username"
-                  th:text="'Hello, ' + ${#authentication.name}">Hello</span>
+                  th:text="${'Hello, ' + #authentication.name}">Hello</span>
             <a sec:authorize="isAnonymous()" th:href="@{/login}">Login</a>
             <a sec:authorize="isAnonymous()" th:href="@{/register}">Register</a>
             <form sec:authorize="isAuthenticated()" th:action="@{/logout}" method="post" class="inline-form">
