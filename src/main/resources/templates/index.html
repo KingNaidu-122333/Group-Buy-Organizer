@@ -113,6 +113,41 @@
             </article>
         </div>
     </section>
+
+    <section id="history" class="listing">
+        <div class="section-head">
+            <h2>Deal history</h2>
+            <p>Every deal created on this platform, newest first.</p>
+        </div>
+        <div class="table-card" th:if="${!#lists.isEmpty(dealHistory)}">
+            <table>
+                <thead>
+                <tr>
+                    <th>Deal</th>
+                    <th>Organizer</th>
+                    <th>Created</th>
+                    <th>Members</th>
+                    <th>Price per person</th>
+                    <th>Status</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="deal : ${dealHistory}">
+                    <td th:text="${deal.title}">Deal title</td>
+                    <td th:text="${deal.organizer}">Organizer</td>
+                    <td th:text="${deal.createdAt}">Created date</td>
+                    <td th:text="${deal.currentMembers + '/' + deal.targetMembers}">0/0</td>
+                    <td th:text="'
+ + ${#numbers.formatDecimal(deal.pricePerPerson, 1, 2)}">$0.00</td>
+                    <td th:text="${deal.status}">Open</td>
+                </tr>
+                </tbody>
+            </table>
+        </div>
+        <p class="flash-message" th:if="${#lists.isEmpty(dealHistory)}">
+            No deals have been created yet. Create the first deal to start the history.
+        </p>
+    </section>
 </main>
 </body>
 </html>
