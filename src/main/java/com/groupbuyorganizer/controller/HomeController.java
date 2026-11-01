@@ -13,6 +13,8 @@ import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
+import java.util.List;
+
 @Controller
 public class HomeController {
     private final GroupBuyService groupBuyService;
@@ -44,9 +46,12 @@ public class HomeController {
         groupBuy.setCreatedBy(username);
         groupBuy.setCurrentMembers(1);
         groupBuy.setStatus("Open");
+
+        // Saving the deal creates its permanent history record in the GroupBuy table.
         groupBuyService.save(groupBuy);
-        redirectAttributes.addFlashAttribute("message", "Deal created successfully.");
-        return "redirect:/#deals";
+
+        redirectAttributes.addFlashAttribute("message", "Deal created and added to deal history.");
+        return "redirect:/#history";
     }
 
     @PostMapping("/groups/{id}/join")
@@ -61,7 +66,9 @@ public class HomeController {
     }
 
     private void populateHomeModel(Model model) {
-        model.addAttribute("groupBuys", groupBuyService.getAllGroupBuys());
+        List<GroupBuy> history = groupBuyService.getDealHistory();
+        model.addAttribute("groupBuys", history);
+        model.addAttribute("dealHistory", history);
         if (!model.containsAttribute("groupBuy")) {
             model.addAttribute("groupBuy", new GroupBuy());
         }
