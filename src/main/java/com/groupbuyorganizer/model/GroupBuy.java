@@ -3,6 +3,7 @@ package com.groupbuyorganizer.model;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.DecimalMin;
 import jakarta.validation.constraints.Min;
+import jakarta.validation.constraints.Max;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
 import jakarta.validation.constraints.Size;
@@ -33,6 +34,7 @@ public class GroupBuy {
 
     @NotNull(message = "Target members is required")
     @Min(value = 2, message = "Target members must be at least 2")
+    @Max(value = 10000, message = "Target members cannot exceed 10000")
     @Column(nullable = false)
     private Integer targetMembers = 2;
 
