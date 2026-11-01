@@ -4,16 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Group Buy Organizer</title>
+    <meta name="description" content="Discover, create and join community group-buy deals.">
+    <title>Group Buy Organizer | Community Deals</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
 <header class="topbar">
     <div class="container nav">
         <a class="brand" th:href="@{/}">Group Buy Organizer</a>
-        <nav>
-            <a th:href="@{/#deals}">Deals</a>
+        <nav aria-label="Main navigation">
+            <a th:href="@{/#deals}">Explore deals</a>
             <a sec:authorize="isAuthenticated()" th:href="@{/#form}">Create</a>
+            <a sec:authorize="isAuthenticated()" th:href="@{/my-deals}">My deals</a>
             <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}">Admin</a>
             <span sec:authorize="isAuthenticated()" class="username"
                   th:text="'Hello, ' + ${#authentication.name}">Hello</span>
@@ -29,63 +31,86 @@
 <main class="container">
     <section class="hero">
         <div>
-            <p class="eyebrow">Fair pricing • real communities</p>
-            <h1>Grow group buys into a thriving community deal platform.</h1>
-            <p class="lead">Launch deals, invite people, track progress, and collect payments when the order hits the target.</p>
+            <p class="eyebrow">Buy together. Save together.</p>
+            <h1>Better deals happen when people come together.</h1>
+            <p class="lead">Discover community purchases, create a group deal, and track progress transparently from the first member to the target.</p>
             <div class="cta-row">
-                <a sec:authorize="isAuthenticated()" class="primary-btn" th:href="@{/#form}">Start a deal</a>
-                <a sec:authorize="isAnonymous()" class="primary-btn" th:href="@{/login}">Sign in to start a deal</a>
-                <a sec:authorize="isAnonymous()" class="secondary-btn" th:href="@{/register}">Create account</a>
+                <a class="primary-btn" th:href="@{/#deals}">Explore deals</a>
+                <a sec:authorize="isAuthenticated()" class="secondary-btn" th:href="@{/#form}">Start a deal</a>
+                <a sec:authorize="isAnonymous()" class="secondary-btn" th:href="@{/register}">Create an account</a>
             </div>
         </div>
         <div class="hero-panel">
-            <div class="stat-card">
-                <strong th:text="${#lists.size(groupBuys)}">0</strong>
-                <span>Group deals</span>
-            </div>
-            <div class="stat-card"><strong>Stripe</strong><span>Secure checkout when configured</span></div>
-            <div class="stat-card"><strong>Group Buy</strong><span>Community purchasing</span></div>
+            <div class="stat-card"><strong th:text="${totalDealCount}">0</strong><span>Total deals</span></div>
+            <div class="stat-card"><strong th:text="${openDealCount}">0</strong><span>Open for members</span></div>
+            <div class="stat-card"><strong th:text="${readyDealCount}">0</strong><span>Ready to order</span></div>
         </div>
     </section>
 
-    <div th:if="${message}" class="flash-message" th:text="${message}"></div>
+    <div th:if="${message}" class="flash-message" role="status" th:text="${message}"></div>
 
     <section id="form" class="form-card" sec:authorize="isAuthenticated()">
-        <h2>Create a new group buy</h2>
+        <div class="section-head">
+            <p class="eyebrow">Start something together</p>
+            <h2>Create a group deal</h2>
+            <p>Set a clear target, explain the offer, and let the community join.</p>
+        </div>
         <form th:action="@{/groups}" th:object="${groupBuy}" method="post">
             <div class="grid">
                 <label>
-                    <span>Title</span>
-                    <input type="text" th:field="*{title}" placeholder="Eco-friendly snack pack" required>
+                    <span>Deal title</span>
+                    <input type="text" th:field="*{title}" maxlength="100" placeholder="Reusable water bottle bundle" required>
                     <small th:if="${#fields.hasErrors('title')}" th:errors="*{title}"></small>
                 </label>
                 <label>
                     <span>Target members</span>
-                    <input type="number" min="2" th:field="*{targetMembers}" required>
+                    <input type="number" min="2" max="10000" th:field="*{targetMembers}" required>
                     <small th:if="${#fields.hasErrors('targetMembers')}" th:errors="*{targetMembers}"></small>
                 </label>
                 <label>
                     <span>Price per person (USD)</span>
-                    <input type="number" step="0.01" min="1" th:field="*{pricePerPerson}" required>
+                    <input type="number" step="0.01" min="0.01" th:field="*{pricePerPerson}" required>
                     <small th:if="${#fields.hasErrors('pricePerPerson')}" th:errors="*{pricePerPerson}"></small>
                 </label>
                 <label class="full-width">
-                    <span>Description</span>
-                    <textarea th:field="*{description}" rows="4" required
-                              placeholder="Describe the deal, shipping plan, or product details..."></textarea>
+                    <span>Deal description</span>
+                    <textarea th:field="*{description}" rows="4" maxlength="1500" required
+                              placeholder="Explain what is included, delivery details, and any important conditions..."></textarea>
                     <small th:if="${#fields.hasErrors('description')}" th:errors="*{description}"></small>
                 </label>
             </div>
-            <button type="submit">Create deal</button>
+            <button type="submit">Publish deal</button>
         </form>
     </section>
     <p sec:authorize="isAnonymous()" class="flash-message">
-        <a th:href="@{/login}">Sign in</a> to create or join a group buy.
+        <a th:href="@{/login}">Sign in</a> or <a th:href="@{/register}">create an account</a> to publish or join deals.
     </p>
 
     <section id="deals" class="listing">
-        <div class="section-head"><h2>Current deals</h2></div>
-        <div class="card-grid">
+        <div class="section-head">
+            <p class="eyebrow">Community marketplace</p>
+            <h2>Explore group deals</h2>
+            <p>Search by title, description or organizer, then filter by deal status.</p>
+        </div>
+        <form class="search-bar" th:action="@{/}" method="get">
+            <label class="search-field">
+                <span class="visually-hidden">Search deals</span>
+                <input type="search" name="q" th:value="${searchQuery}" placeholder="Search group deals..." aria-label="Search group deals">
+            </label>
+            <label class="status-field">
+                <span class="visually-hidden">Filter by status</span>
+                <select name="status" aria-label="Filter by deal status">
+                    <option value="">All statuses</option>
+                    <option value="Open" th:selected="${selectedStatus == 'Open'}">Open</option>
+                    <option value="Ready to Order" th:selected="${selectedStatus == 'Ready to Order'}">Ready to order</option>
+                    <option value="Closed" th:selected="${selectedStatus == 'Closed'}">Closed</option>
+                </select>
+            </label>
+            <button type="submit">Search</button>
+            <a class="reset-link" th:href="@{/#deals}">Reset</a>
+        </form>
+
+        <div class="card-grid" th:if="${!#lists.isEmpty(groupBuys)}">
             <article class="deal-card" th:each="deal : ${groupBuys}">
                 <div class="deal-header">
                     <h3 th:text="${deal.title}">Deal title</h3>
@@ -96,7 +121,14 @@
                     <li><strong>Organizer:</strong> <span th:text="${deal.organizer}">Name</span></li>
                     <li><strong>Members:</strong> <span th:text="${deal.currentMembers + '/' + deal.targetMembers}">0/0</span></li>
                     <li><strong>Price:</strong> $<span th:text="${#numbers.formatDecimal(deal.pricePerPerson, 1, 2)}">0.00</span> each</li>
+                    <li><strong>Created:</strong> <span th:text="${#temporals.format(deal.createdAt, 'dd MMM yyyy')}">Date</span></li>
                 </ul>
+                <div class="progress-track" role="progressbar"
+                     th:attr="aria-valuenow=${deal.currentMembers},aria-valuemin=0,aria-valuemax=${deal.targetMembers},aria-label='Deal membership progress'">
+                    <div class="progress-fill"
+                         th:style="'width:' + ${T(java.lang.Math).min(100, (deal.currentMembers * 100.0 / deal.targetMembers))} + '%'"></div>
+                </div>
+                <p class="progress-label" th:text="${deal.currentMembers + ' of ' + deal.targetMembers + ' members'}">0 members</p>
                 <div class="deal-actions">
                     <form sec:authorize="isAuthenticated()" th:if="${deal.status == 'Open'}"
                           th:action="@{/groups/{id}/join(id=${deal.id})}" method="post">
@@ -106,60 +138,50 @@
                        class="secondary-btn" th:href="@{/login}">Sign in to join</a>
                     <form sec:authorize="isAuthenticated()" th:if="${deal.status == 'Ready to Order'}"
                           th:action="@{/checkout/{id}(id=${deal.id})}" method="post">
-                        <button type="submit" class="secondary-action">Pay now</button>
+                        <button type="submit" class="secondary-action">Proceed to checkout</button>
                     </form>
-                    <span th:if="${deal.status == 'Closed'}">This group is closed.</span>
+                    <span th:if="${deal.status == 'Closed'}" class="muted">This group is closed.</span>
                 </div>
             </article>
+        </div>
+        <div class="empty-state" th:if="${#lists.isEmpty(groupBuys)}">
+            <h3>No matching deals found</h3>
+            <p>Try another search term or clear the status filter.</p>
+            <a class="secondary-btn" th:href="@{/#deals}">Clear filters</a>
         </div>
     </section>
 
     <section id="history" class="listing">
         <div class="section-head">
+            <p class="eyebrow">Transparent activity</p>
             <h2>Deal history</h2>
-            <p>Every deal created on this platform, newest first.</p>
+            <p>All created deals remain recorded here, newest first, including deals that are ready or closed.</p>
         </div>
         <div class="table-card" th:if="${!#lists.isEmpty(dealHistory)}">
-            <table>
-                <thead>
-                <tr>
-                    <th>Deal</th>
-                    <th>Organizer</th>
-                    <th>Created</th>
-                    <th>Members</th>
-                    <th>Price per person</th>
-                    <th>Status</th>
-                </tr>
-                </thead>
-                <tbody>
-                <tr th:each="deal : ${dealHistory}">
-                    <td th:text="${deal.title}">Deal title</td>
-                    <td th:text="${deal.organizer}">Organizer</td>
-                    <td th:text="${deal.createdAt}">Created date</td>
-                    <td th:text="${deal.currentMembers + '/' + deal.targetMembers}">0/0</td>
-                    <td th:text="${#numbers.formatDecimal(deal.pricePerPerson, 1, 2)}">0.00</td>
-                    <td th:text="${deal.status}">Open</td>
-                </tr>
-                </tbody>
-            </table>
+            <div class="table-scroll">
+                <table>
+                    <thead><tr><th>Deal</th><th>Organizer</th><th>Created</th><th>Members</th><th>Price / person</th><th>Status</th></tr></thead>
+                    <tbody>
+                    <tr th:each="deal : ${dealHistory}">
+                        <td th:text="${deal.title}">Deal title</td>
+                        <td th:text="${deal.organizer}">Organizer</td>
+                        <td th:text="${#temporals.format(deal.createdAt, 'dd MMM yyyy HH:mm')}">Date</td>
+                        <td th:text="${deal.currentMembers + '/' + deal.targetMembers}">0/0</td>
+                        <td th:text="${#numbers.formatDecimal(deal.pricePerPerson, 1, 2)}">0.00</td>
+                        <td><span class="badge" th:text="${deal.status}">Open</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
         </div>
-        <p class="flash-message" th:if="${#lists.isEmpty(dealHistory)}">
-            No deals have been created yet. Create the first deal to start the history.
-        </p>
+        <div class="empty-state" th:if="${#lists.isEmpty(dealHistory)}">
+            <h3>No deal history yet</h3>
+            <p>When the first deal is created, it will be recorded here.</p>
+        </div>
     </section>
 </main>
-</body>
-</html>
- + #numbers.formatDecimal(deal.pricePerPerson, 1, 2)}">$0.00</td>
-                    <td th:text="${deal.status}">Open</td>
-                </tr>
-                </tbody>
-            </table>
-        </div>
-        <p class="flash-message" th:if="${#lists.isEmpty(dealHistory)}">
-            No deals have been created yet. Create the first deal to start the history.
-        </p>
-    </section>
-</main>
+<footer class="site-footer">
+    <div class="container"><span>Group Buy Organizer</span><span>Community-powered group purchasing</span></div>
+</footer>
 </body>
 </html>
