@@ -40,7 +40,9 @@ public class StripeWebhookController {
                 if (!(stripeObject instanceof Session session)) {
                     return ResponseEntity.badRequest().body("Invalid checkout session payload");
                 }
-                paymentService.recordPaidSession(session);
+                if ("paid".equalsIgnoreCase(session.getPaymentStatus())) {
+                    paymentService.recordPaidSession(session);
+                }
             }
             return ResponseEntity.ok("received");
         } catch (SignatureVerificationException ex) {
