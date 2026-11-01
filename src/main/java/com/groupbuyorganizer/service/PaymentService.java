@@ -32,6 +32,13 @@ public class PaymentService {
         this.userRepository = userRepository;
     }
 
+    @Transactional(readOnly = true)
+    public boolean hasPaid(Long groupBuyId, String username) {
+        return userRepository.findByUsername(username)
+                .map(user -> paymentRepository.existsByGroupBuy_IdAndUser_Id(groupBuyId, user.getId()))
+                .orElse(false);
+    }
+
     @Transactional
     public Payment recordPaidSession(Session session) {
         if (session == null || !"paid".equalsIgnoreCase(session.getPaymentStatus())
