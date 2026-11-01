@@ -4,6 +4,7 @@ import com.groupbuyorganizer.model.GroupBuy;
 import com.groupbuyorganizer.repository.GroupBuyRepository;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
+
 import java.util.List;
 
 @Service
@@ -17,6 +18,11 @@ public class GroupBuyService {
     @Transactional(readOnly = true)
     public List<GroupBuy> getAllGroupBuys() {
         return repository.findAll();
+    }
+
+    @Transactional(readOnly = true)
+    public List<GroupBuy> getDealHistory() {
+        return repository.findAllByOrderByCreatedAtDesc();
     }
 
     @Transactional(readOnly = true)
