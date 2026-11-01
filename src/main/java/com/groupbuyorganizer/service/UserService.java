@@ -8,6 +8,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
 import java.util.Locale;
+import java.nio.charset.StandardCharsets;
 
 @Service
 public class UserService {
@@ -29,7 +30,7 @@ public class UserService {
         if (userRepository.findByEmailIgnoreCase(cleanEmail).isPresent()) {
             throw new IllegalArgumentException("That email address is already registered.");
         }
-        if (rawPassword == null || rawPassword.length() < 8 || rawPassword.length() > 72) {
+        if (rawPassword == null || rawPassword.length() < 8 || rawPassword.getBytes(StandardCharsets.UTF_8).length > 72) {
             throw new IllegalArgumentException("Password must be between 8 and 72 characters.");
         }
         try {
