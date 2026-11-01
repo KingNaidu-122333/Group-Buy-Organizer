@@ -7,56 +7,82 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-    <header class="topbar">
-        <div class="container nav">
-            <div class="brand">Admin Dashboard</div>
-            <nav>
-                <a th:href="@{/}">Home</a>
-                <a th:href="@{/logout}" onclick="event.preventDefault(); document.getElementById('logoutForm').submit();">Logout</a>
-                <form id="logoutForm" th:action="@{/logout}" method="post" style="display:none;"></form>
-            </nav>
-        </div>
-    </header>
-
-    <main class="container dashboard-shell">
-        <section class="dashboard-overview">
-            <div class="stat-lg">
-                <strong th:text="${#lists.size(groupBuys)}">0</strong>
-                <span>Total deals</span>
-            </div>
-            <div class="stat-lg">
-                <strong>Admin</strong>
-                <span>Role access</span>
-            </div>
-        </section>
-
-        <section class="table-card">
-            <h2>Group buy overview</h2>
+<header class="topbar">
+    <div class="container nav">
+        <a class="brand" th:href="@{/admin}">Group Buy Organizer · Admin</a>
+        <nav aria-label="Admin navigation">
+            <a th:href="@{/}">View marketplace</a>
+            <form th:action="@{/logout}" method="post" class="inline-form">
+                <button type="submit" class="nav-link-button">Logout</button>
+            </form>
+        </nav>
+    </div>
+</header>
+<main class="container dashboard-shell">
+    <section class="section-head">
+        <p class="eyebrow">Platform overview</p>
+        <h1>Admin dashboard</h1>
+        <p>Monitor all group deals and manage their availability.</p>
+    </section>
+    <div class="dashboard-overview">
+        <div class="stat-lg"><strong th:text="${totalDeals}">0</strong><span>Total deals</span></div>
+        <div class="stat-lg"><strong th:text="${openDeals}">0</strong><span>Open</span></div>
+        <div class="stat-lg"><strong th:text="${readyDeals}">0</strong><span>Ready to order</span></div>
+        <div class="stat-lg"><strong th:text="${closedDeals}">0</strong><span>Closed</span></div>
+    </div>
+    <div th:if="${message}" class="flash-message" role="status" th:text="${message}"></div>
+    <section class="table-card">
+        <h2>Manage group deals</h2>
+        <div class="table-scroll">
             <table>
-                <thead>
-                <tr>
-                    <th>Title</th>
-                    <th>Organizer</th>
-                    <th>Status</th>
-                    <th>Members</th>
-                    <th>Action</th>
-                </tr>
-                </thead>
+                <thead><tr><th>Deal</th><th>Organizer</th><th>Created</th><th>Members</th><th>Status</th><th>Action</th></tr></thead>
                 <tbody>
                 <tr th:each="deal : ${groupBuys}">
-                    <td th:text="${deal.title}">Deal</td>
+                    <td><strong th:text="${deal.title}">Deal</strong></td>
                     <td th:text="${deal.organizer}">Organizer</td>
-                    <td th:text="${deal.status}">Open</td>
-                    <td th:text="${deal.currentMembers} + '/' + ${deal.targetMembers}">0/0</td>
+                    <td th:text="${#temporals.format(deal.createdAt, 'dd MMM yyyy')}">Date</td>
+                    <td th:text="${deal.currentMembers + '/' + deal.targetMembers}">0/0</td>
+                    <td><span class="badge" th:text="${deal.status}">Open</span></td>
                     <td>
-                        <form th:action="@{/admin/groups/{id}/close(id=${deal.id})}" method="post">
-                            <button type="submit" class="table-btn">Close</button>
+                        <form th:if="${deal.status != 'Closed'}"
+                              th:action="@{/admin/groups/{id}/close(id=${deal.id})}" method="post">
+                            <button type="submit" class="table-btn">Close deal</button>
                         </form>
+                        <span th:if="${deal.status == 'Closed'}" class="muted">Already closed</span>
                     </td>
                 </tr>
+                <tr th:if="${#lists.isEmpty(groupBuys)}"><td colspan="6">No deals have been created.</td></tr>
                 </tbody>
             </table>
-        </section>
-    </main>
+        </div>
+    </section>
+    <section class="listing">
+        <div class="section-head">
+            <p class="eyebrow">Financial activity</p>
+            <h2>Verified payment history</h2>
+            <p>Payments recorded after Stripe session verification or a signed webhook.</p>
+        </div>
+        <div class="table-card" th:if="${!#lists.isEmpty(payments)}">
+            <div class="table-scroll">
+                <table>
+                    <thead><tr><th>Deal</th><th>Member</th><th>Amount</th><th>Currency</th><th>Paid at</th><th>Status</th></tr></thead>
+                    <tbody>
+                    <tr th:each="payment : ${payments}">
+                        <td th:text="${payment.groupBuy.title}">Deal</td>
+                        <td th:text="${payment.user.username}">Member</td>
+                        <td th:text="${#numbers.formatDecimal(payment.amountTotal / 100.0, 1, 2)}">0.00</td>
+                        <td th:text="${#strings.toUpperCase(payment.currency)}">USD</td>
+                        <td th:text="${#temporals.format(payment.paidAt, 'dd MMM yyyy HH:mm')}">Date</td>
+                        <td><span class="badge" th:text="${payment.status}">PAID</span></td>
+                    </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+        <div class="empty-state" th:if="${#lists.isEmpty(payments)}">
+            <p>No verified payments have been recorded yet.</p>
+        </div>
+    </section>
+</main>
 </body>
 </html>

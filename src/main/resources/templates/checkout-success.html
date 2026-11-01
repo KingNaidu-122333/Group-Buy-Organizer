@@ -3,16 +3,16 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Order Complete • Group Buy Organizer</title>
+    <title>Payment Confirmed • Group Buy Organizer</title>
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body>
-    <main class="container success-shell">
-        <section class="success-card">
-            <h1>Payment complete</h1>
-            <p>Your checkout has been completed successfully. The group buy organizer will follow up on fulfillment.</p>
-            <a class="primary-btn" th:href="@{/}">Back to deals</a>
-        </section>
-    </main>
+<main class="container success-shell">
+    <section class="success-card">
+        <h1>Payment confirmed</h1>
+        <p>Stripe has confirmed that your payment was successful for <strong th:text="${dealTitle}">your group deal</strong>.</p>
+        <a class="primary-btn" th:href="@{/#deals}">Back to deals</a>
+    </section>
+</main>
 </body>
 </html>
