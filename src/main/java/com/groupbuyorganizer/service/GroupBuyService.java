@@ -39,7 +39,7 @@ public class GroupBuyService {
                 .filter(deal -> term.isEmpty()
                         || deal.getTitle().toLowerCase(Locale.ROOT).contains(term)
                         || deal.getDescription().toLowerCase(Locale.ROOT).contains(term)
-                        || deal.getOrganizer().toLowerCase(Locale.ROOT).contains(term))
+                        || (deal.getOrganizer() != null && deal.getOrganizer().toLowerCase(Locale.ROOT).contains(term)))
                 .filter(deal -> selectedStatus.isEmpty()
                         || "ALL".equalsIgnoreCase(selectedStatus)
                         || deal.getStatus().equalsIgnoreCase(selectedStatus))
