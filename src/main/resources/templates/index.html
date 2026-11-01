@@ -13,7 +13,7 @@
     <div class="container nav">
         <a class="brand" th:href="@{/}">Group Buy Organizer</a>
         <nav aria-label="Main navigation">
-            <a th:href="@{/#deals}">Explore deals</a>
+            <a th:href="@{/#live-deals}">Explore live deals</a>
             <a sec:authorize="isAuthenticated()" th:href="@{/#form}">Create</a>
             <a sec:authorize="isAuthenticated()" th:href="@{/my-deals}">My deals</a>
             <a sec:authorize="hasRole('ADMIN')" th:href="@{/admin}">Admin</a>
@@ -35,7 +35,7 @@
             <h1>Better deals happen when people come together.</h1>
             <p class="lead">Discover community purchases, create a group deal, and track progress transparently from the first member to the target.</p>
             <div class="cta-row">
-                <a class="primary-btn" th:href="@{/#deals}">Explore deals</a>
+                <a class="primary-btn" th:href="@{/#live-deals}">Explore deals</a>
                 <a sec:authorize="isAuthenticated()" class="secondary-btn" th:href="@{/#form}">Start a deal</a>
                 <a sec:authorize="isAnonymous()" class="secondary-btn" th:href="@{/register}">Create an account</a>
             </div>
@@ -44,10 +44,18 @@
             <div class="stat-card"><strong th:text="${totalDealCount}">0</strong><span>Total deals</span></div>
             <div class="stat-card"><strong th:text="${openDealCount}">0</strong><span>Open for members</span></div>
             <div class="stat-card"><strong th:text="${readyDealCount}">0</strong><span>Ready to order</span></div>
+            <div class="stat-card"><strong th:text="${liveDealCount}">0</strong><span>Live deals</span></div>
         </div>
     </section>
 
-    <div th:if="${message}" class="flash-message" role="status" th:text="${message}"></div>
+    <div th:if="${message}" id="deal-created-toast" class="flash-message toast-message"
+         th:classappend="${messageType == 'success'} ? ' toast-success' : ''"
+         role="status" aria-live="polite">
+        <span class="toast-icon" aria-hidden="true">✓</span>
+        <span th:text="${message}">Deal created successfully.</span>
+        <button type="button" class="toast-close" aria-label="Dismiss notification"
+                onclick="this.parentElement.remove()">×</button>
+    </div>
 
     <section id="form" class="form-card" sec:authorize="isAuthenticated()">
         <div class="section-head">
@@ -86,11 +94,11 @@
         <a th:href="@{/login}">Sign in</a> or <a th:href="@{/register}">create an account</a> to publish or join deals.
     </p>
 
-    <section id="deals" class="listing">
+    <section id="live-deals" class="listing">
         <div class="section-head">
             <p class="eyebrow">Community marketplace</p>
-            <h2>Explore group deals</h2>
-            <p>Search by title, description or organizer, then filter by deal status.</p>
+            <h2>Live deals</h2>
+            <p><strong th:text="${liveDealCount}">0</strong> active deals are available below. Newly created deals appear here immediately.</p>
         </div>
         <form class="search-bar" th:action="@{/}" method="get">
             <label class="search-field">
@@ -176,7 +184,7 @@
         </div>
         <div class="empty-state" th:if="${#lists.isEmpty(dealHistory)}">
             <h3>No deal history yet</h3>
-            <p>When the first deal is created, it will be recorded here.</p>
+            <p>When a deal is created, it appears in the live deals list and is recorded here.</p>
         </div>
     </section>
 </main>
