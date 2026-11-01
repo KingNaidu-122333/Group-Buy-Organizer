@@ -7,3 +7,7 @@
 *.log
 .DS_Store
 .env
+
+# Local H2 database files
+*.mv.db
+*.trace.db
