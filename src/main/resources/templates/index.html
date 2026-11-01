@@ -111,11 +111,10 @@
                     <option value="">All statuses</option>
                     <option value="Open" th:selected="${selectedStatus == 'Open'}">Open</option>
                     <option value="Ready to Order" th:selected="${selectedStatus == 'Ready to Order'}">Ready to order</option>
-                    <option value="Closed" th:selected="${selectedStatus == 'Closed'}">Closed</option>
                 </select>
             </label>
             <button type="submit">Search</button>
-            <a class="reset-link" th:href="@{/#deals}">Reset</a>
+            <a class="reset-link" th:href="@{/#live-deals}">Reset</a>
         </form>
 
         <div class="card-grid" th:if="${!#lists.isEmpty(groupBuys)}">
@@ -188,6 +187,18 @@
         </div>
     </section>
 </main>
+<script>
+    // Flash feedback is shown after the server confirms the deal was saved.
+    document.addEventListener("DOMContentLoaded", function () {
+        const toast = document.getElementById("deal-created-toast");
+        if (toast) {
+            window.setTimeout(function () {
+                toast.classList.add("toast-hide");
+                window.setTimeout(function () { toast.remove(); }, 350);
+            }, 5000);
+        }
+    });
+</script>
 <footer class="site-footer">
     <div class="container"><span>Group Buy Organizer</span><span>Community-powered group purchasing</span></div>
 </footer>
