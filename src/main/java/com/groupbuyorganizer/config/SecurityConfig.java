@@ -21,7 +21,7 @@ public class SecurityConfig {
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         http.csrf(csrf -> csrf.ignoringRequestMatchers("/webhooks/stripe"))
             .authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/images/**", "/error", "/webhooks/stripe").permitAll()
+                .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/images/**", "/error", "/access-denied", "/webhooks/stripe").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/groups/**", "/checkout/**").authenticated()
                 .anyRequest().authenticated())
@@ -30,6 +30,7 @@ public class SecurityConfig {
                 .successHandler((request, response, authentication) ->
                     response.sendRedirect(request.getContextPath() + landingPage(authentication)))
                 .permitAll())
+            .exceptionHandling(errors -> errors.accessDeniedPage("/access-denied"))
             .logout(logout -> logout.logoutUrl("/logout")
                 .logoutSuccessUrl("/login?logout")
                 .invalidateHttpSession(true).clearAuthentication(true)
