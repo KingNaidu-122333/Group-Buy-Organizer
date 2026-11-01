@@ -29,6 +29,9 @@ public class DataInitializer {
             // Never retain the old demo password. Provision the bootstrap administrator from an environment secret.
             User bootstrapAdmin = userRepository.findByUsername(adminUsername).orElse(null);
             if (adminPassword != null && !adminPassword.isBlank()) {
+                if (adminPassword.length() < 12) {
+                    throw new IllegalStateException("APP_ADMIN_PASSWORD must be at least 12 characters long.");
+                }
                 if (bootstrapAdmin == null) {
                     bootstrapAdmin = new User(adminUsername, adminEmail,
                             passwordEncoder.encode(adminPassword), User.Role.ADMIN);
