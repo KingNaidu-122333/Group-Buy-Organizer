@@ -26,10 +26,8 @@ public class GroupBuy {
     @Column(nullable = false, length = 1500)
     private String description;
 
-    @Column(nullable = false)
     private String organizer;
 
-    @Column(nullable = false)
     private String createdBy;
 
     @NotNull(message = "Target members is required")
