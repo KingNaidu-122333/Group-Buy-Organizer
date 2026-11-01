@@ -47,6 +47,11 @@ public class GroupBuyService {
     }
 
     @Transactional(readOnly = true)
+    public List<GroupBuy> getDealsCreatedBy(String username) {
+        return repository.findAllByCreatedByOrderByCreatedAtDesc(username);
+    }
+
+    @Transactional(readOnly = true)
     public List<GroupBuy> getDealHistory() {
         return repository.findAllByOrderByCreatedAtDesc();
     }
