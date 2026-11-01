@@ -10,10 +10,18 @@ services:
         value: 8080
       - key: APP_URL
         value: https://group-buy-organizer.onrender.com
-      - key: DATABASE_URL
+      - key: DB_HOST
         fromDatabase:
           name: group-buy-organizer-db
-          property: connectionString
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: group-buy-organizer-db
+          property: port
+      - key: DB_NAME
+        fromDatabase:
+          name: group-buy-organizer-db
+          property: database
       - key: DB_USERNAME
         fromDatabase:
           name: group-buy-organizer-db
@@ -22,10 +30,6 @@ services:
         fromDatabase:
           name: group-buy-organizer-db
           property: password
-      - key: DB_DRIVER
-        value: org.postgresql.Driver
-      - key: DB_DIALECT
-        value: org.hibernate.dialect.PostgreSQLDialect
       - key: STRIPE_SECRET_KEY
         sync: false
       - key: STRIPE_PUBLIC_KEY
@@ -40,8 +44,6 @@ services:
         value: admin@example.com
       - key: APP_ADMIN_PASSWORD
         sync: false
-      - key: COOKIE_SECURE
-        value: true
       - key: H2_CONSOLE_ENABLED
         value: false
       - key: DDL_AUTO
