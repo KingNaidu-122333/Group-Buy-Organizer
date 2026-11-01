@@ -40,6 +40,7 @@ public class CheckoutController {
         GroupBuy deal = groupBuyService.getById(id);
         if (!"Ready to Order".equalsIgnoreCase(deal.getStatus())) return "redirect:/#deals";
         if (!groupBuyService.isMember(id, authentication.getName())) return "checkout-error";
+        if (paymentService.hasPaid(id, authentication.getName())) return "checkout-error";
         if (stripeSecretKey == null || stripeSecretKey.isBlank()) return "checkout-error";
         if (deal.getPricePerPerson() == null || deal.getPricePerPerson() <= 0) return "checkout-error";
 
