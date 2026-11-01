@@ -15,7 +15,6 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class HomeController {
-
     private final GroupBuyService groupBuyService;
 
     public HomeController(GroupBuyService groupBuyService) {
@@ -24,9 +23,9 @@ public class HomeController {
 
     @GetMapping("/")
     public String index(Model model, Authentication authentication) {
-        model.addAttribute("groupBuys", groupBuyService.getAllGroupBuys());
-        model.addAttribute("groupBuy", new GroupBuy());
-        if (authentication != null && authentication.isAuthenticated()) {
+        populateHomeModel(model);
+        if (authentication != null && authentication.isAuthenticated()
+                && !"anonymousUser".equals(authentication.getName())) {
             model.addAttribute("currentUser", authentication.getName());
         }
         return "index";
@@ -34,35 +33,37 @@ public class HomeController {
 
     @PostMapping("/groups")
     public String createGroup(@Valid @ModelAttribute("groupBuy") GroupBuy groupBuy,
-                              BindingResult bindingResult,
-                              Model model,
-                              Authentication authentication,
-                              RedirectAttributes redirectAttributes) {
+                              BindingResult bindingResult, Model model,
+                              Authentication authentication, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
-            model.addAttribute("groupBuys", groupBuyService.getAllGroupBuys());
-            redirectAttributes.addFlashAttribute("message", "Please fix the form errors before creating the deal.");
+            populateHomeModel(model);
             return "index";
         }
-
-        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getName())) {
-            groupBuy.setOrganizer("Guest");
-            groupBuy.setCreatedBy("Guest");
-        } else {
-            String username = authentication.getName();
-            groupBuy.setOrganizer(username);
-            groupBuy.setCreatedBy(username);
-        }
-
+        String username = authentication.getName();
+        groupBuy.setOrganizer(username);
+        groupBuy.setCreatedBy(username);
+        groupBuy.setCurrentMembers(1);
+        groupBuy.setStatus("Open");
         groupBuyService.save(groupBuy);
-        redirectAttributes.addFlashAttribute("message", "Deal created successfully and added to current deals.");
-        return "redirect:/";
+        redirectAttributes.addFlashAttribute("message", "Deal created successfully.");
+        return "redirect:/#deals";
     }
 
     @PostMapping("/groups/{id}/join")
     public String joinGroup(@PathVariable Long id, RedirectAttributes redirectAttributes) {
-        GroupBuy groupBuy = groupBuyService.getById(id);
-        groupBuyService.joinGroup(id);
-        redirectAttributes.addFlashAttribute("message", "You joined the deal: " + groupBuy.getTitle() + ".");
-        return "redirect:/";
+        try {
+            GroupBuy joined = groupBuyService.joinGroup(id);
+            redirectAttributes.addFlashAttribute("message", "You joined the deal: " + joined.getTitle() + ".");
+        } catch (IllegalArgumentException | IllegalStateException ex) {
+            redirectAttributes.addFlashAttribute("message", ex.getMessage());
+        }
+        return "redirect:/#deals";
+    }
+
+    private void populateHomeModel(Model model) {
+        model.addAttribute("groupBuys", groupBuyService.getAllGroupBuys());
+        if (!model.containsAttribute("groupBuy")) {
+            model.addAttribute("groupBuy", new GroupBuy());
+        }
     }
 }
