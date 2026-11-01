@@ -7,6 +7,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import java.util.Optional;
+import java.util.Locale;
 
 @Service
 public class UserService {
@@ -20,12 +21,12 @@ public class UserService {
 
     @Transactional
     public User register(String username, String email, String rawPassword) {
-        String cleanUsername = username == null ? "" : username.trim().toLowerCase();
-        String cleanEmail = email == null ? "" : email.trim().toLowerCase();
-        if (userRepository.findByUsername(cleanUsername).isPresent()) {
+        String cleanUsername = username == null ? "" : username.trim().toLowerCase(Locale.ROOT);
+        String cleanEmail = email == null ? "" : email.trim().toLowerCase(Locale.ROOT);
+        if (userRepository.findByUsernameIgnoreCase(cleanUsername).isPresent()) {
             throw new IllegalArgumentException("That username is already in use.");
         }
-        if (userRepository.findByEmail(cleanEmail).isPresent()) {
+        if (userRepository.findByEmailIgnoreCase(cleanEmail).isPresent()) {
             throw new IllegalArgumentException("That email address is already registered.");
         }
         if (rawPassword == null || rawPassword.length() < 8 || rawPassword.length() > 72) {
@@ -42,6 +43,6 @@ public class UserService {
 
     @Transactional(readOnly = true)
     public Optional<User> findByUsername(String username) {
-        return userRepository.findByUsername(username);
+        return userRepository.findByUsernameIgnoreCase(username);
     }
 }
