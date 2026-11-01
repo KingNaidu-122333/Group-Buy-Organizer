@@ -26,11 +26,22 @@ public class DataInitializer {
                               UserRepository userRepository,
                               PasswordEncoder passwordEncoder) {
         return args -> {
-            // Never ship a known default password. Configure APP_ADMIN_PASSWORD explicitly.
-            if (adminPassword != null && !adminPassword.isBlank()
-                    && userRepository.findByUsername(adminUsername).isEmpty()) {
-                userRepository.save(new User(adminUsername, adminEmail,
-                        passwordEncoder.encode(adminPassword), User.Role.ADMIN));
+            // Never retain the old demo password. Provision the bootstrap administrator from an environment secret.
+            User bootstrapAdmin = userRepository.findByUsername(adminUsername).orElse(null);
+            if (adminPassword != null && !adminPassword.isBlank()) {
+                if (bootstrapAdmin == null) {
+                    bootstrapAdmin = new User(adminUsername, adminEmail,
+                            passwordEncoder.encode(adminPassword), User.Role.ADMIN);
+                } else {
+                    bootstrapAdmin.setEmail(adminEmail);
+                    bootstrapAdmin.setPassword(passwordEncoder.encode(adminPassword));
+                    bootstrapAdmin.setRole(User.Role.ADMIN);
+                }
+                userRepository.save(bootstrapAdmin);
+            } else if (bootstrapAdmin != null && bootstrapAdmin.getRole() == User.Role.ADMIN) {
+                // An old admin/admin123 account must not remain privileged when no secret is configured.
+                bootstrapAdmin.setRole(User.Role.USER);
+                userRepository.save(bootstrapAdmin);
             }
 
             if (groupBuyRepository.count() == 0) {
