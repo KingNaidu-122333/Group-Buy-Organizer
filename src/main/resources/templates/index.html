@@ -137,7 +137,7 @@
                     <td th:text="${deal.organizer}">Organizer</td>
                     <td th:text="${deal.createdAt}">Created date</td>
                     <td th:text="${deal.currentMembers + '/' + deal.targetMembers}">0/0</td>
-                    <td th:text="${'
+                    <td th:text="${#numbers.formatDecimal(deal.pricePerPerson, 1, 2)}">0.00</td>
                     <td th:text="${deal.status}">Open</td>
                 </tr>
                 </tbody>
