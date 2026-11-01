@@ -10,7 +10,7 @@ import jakarta.validation.constraints.Size;
 import java.time.LocalDateTime;
 
 @Entity
-@Table(name = "group_buys")
+@Table(name = "group_buy")
 public class GroupBuy {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
