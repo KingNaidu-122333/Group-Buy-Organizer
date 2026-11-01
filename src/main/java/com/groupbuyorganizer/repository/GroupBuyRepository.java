@@ -13,6 +13,7 @@ import java.util.Optional;
 @Repository
 public interface GroupBuyRepository extends JpaRepository<GroupBuy, Long> {
     List<GroupBuy> findAllByOrderByCreatedAtDesc();
+    List<GroupBuy> findAllByCreatedByOrderByCreatedAtDesc(String username);
 
     @Lock(LockModeType.PESSIMISTIC_WRITE)
     @Query("select g from GroupBuy g where g.id = :id")
