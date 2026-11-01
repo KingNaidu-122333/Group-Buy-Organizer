@@ -7,6 +7,7 @@ import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.validation.BindingResult;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 import java.util.List;
@@ -17,6 +18,11 @@ public class HomeController {
 
     public HomeController(GroupBuyService groupBuyService) {
         this.groupBuyService = groupBuyService;
+    }
+
+    @InitBinder("groupBuy")
+    void configureGroupBuyBinding(WebDataBinder binder) {
+        binder.setAllowedFields("title", "description", "targetMembers", "pricePerPerson");
     }
 
     @GetMapping("/")
