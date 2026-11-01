@@ -61,7 +61,10 @@ public class GroupBuyService {
     public GroupBuy save(GroupBuy groupBuy) {
         groupBuy.setCurrentMembers(1);
         groupBuy.setStatus("Open");
-        return repository.save(groupBuy);
+        GroupBuy saved = repository.save(groupBuy);
+        userRepository.findByUsername(saved.getCreatedBy()).ifPresent(
+                creator -> membershipRepository.save(new GroupBuyMembership(saved, creator)));
+        return saved;
     }
 
     @Transactional
