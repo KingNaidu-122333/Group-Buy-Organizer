@@ -34,7 +34,8 @@ public class StripeWebhookController {
         }
         try {
             Event event = Webhook.constructEvent(payload, signature, webhookSecret);
-            if ("checkout.session.completed".equals(event.getType())) {
+            if ("checkout.session.completed".equals(event.getType())
+                    || "checkout.session.async_payment_succeeded".equals(event.getType())) {
                 StripeObject stripeObject = event.getDataObjectDeserializer().getObject().orElse(null);
                 if (!(stripeObject instanceof Session session)) {
                     return ResponseEntity.badRequest().body("Invalid checkout session payload");
