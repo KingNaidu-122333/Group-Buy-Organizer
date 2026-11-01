@@ -11,10 +11,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 public class CheckoutController {
-
     private final GroupBuyService groupBuyService;
 
     @Value("${stripe.secret.key:}")
@@ -29,46 +29,43 @@ public class CheckoutController {
 
     @PostMapping("/checkout/{id}")
     public String createCheckout(@PathVariable Long id) {
-        GroupBuy groupBuy = groupBuyService.getById(id);
-
-        if (stripeSecretKey == null || stripeSecretKey.isBlank()) {
-            return "redirect:/checkout/success?group=" + groupBuy.getId();
-        }
+        GroupBuy deal = groupBuyService.getById(id);
+        if (!"Ready to Order".equalsIgnoreCase(deal.getStatus())) return "redirect:/#deals";
+        if (stripeSecretKey == null || stripeSecretKey.isBlank()) return "checkout-error";
 
         Stripe.apiKey = stripeSecretKey;
-
         try {
             SessionCreateParams params = SessionCreateParams.builder()
                     .setMode(SessionCreateParams.Mode.PAYMENT)
-                    .setSuccessUrl(appUrl + "/checkout/success?group=" + groupBuy.getId())
-                    .setCancelUrl(appUrl + "/")
-                    .addLineItem(
-                            SessionCreateParams.LineItem.builder()
-                                    .setQuantity(1L)
-                                    .setPriceData(
-                                            SessionCreateParams.LineItem.PriceData.builder()
-                                                    .setCurrency("usd")
-                                                    .setUnitAmount(Math.round(groupBuy.getPricePerPerson() * 100))
-                                                    .setProductData(
-                                                            SessionCreateParams.LineItem.PriceData.ProductData.builder()
-                                                                    .setName(groupBuy.getTitle())
-                                                                    .build()
-                                                    )
-                                                    .build()
-                                    )
-                                    .build()
-                    )
+                    .setSuccessUrl(appUrl + "/checkout/success?session_id={CHECKOUT_SESSION_ID}")
+                    .setCancelUrl(appUrl + "/#deals")
+                    .putMetadata("groupBuyId", String.valueOf(deal.getId()))
+                    .addLineItem(SessionCreateParams.LineItem.builder().setQuantity(1L)
+                            .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
+                                    .setCurrency("usd")
+                                    .setUnitAmount(Math.round(deal.getPricePerPerson() * 100))
+                                    .setProductData(SessionCreateParams.LineItem.PriceData.ProductData.builder()
+                                            .setName(deal.getTitle()).build())
+                                    .build()).build())
                     .build();
-
             Session session = Session.create(params);
             return "redirect:" + session.getUrl();
-        } catch (StripeException e) {
-            return "redirect:/checkout/success?group=" + groupBuy.getId();
+        } catch (StripeException ex) {
+            return "checkout-error";
         }
     }
 
     @GetMapping("/checkout/success")
-    public String checkoutSuccess() {
-        return "checkout-success";
+    public String checkoutSuccess(@RequestParam(name = "session_id", required = false) String sessionId) {
+        if (sessionId == null || sessionId.isBlank() || stripeSecretKey == null || stripeSecretKey.isBlank()) {
+            return "checkout-error";
+        }
+        Stripe.apiKey = stripeSecretKey;
+        try {
+            Session session = Session.retrieve(sessionId);
+            return "paid".equalsIgnoreCase(session.getPaymentStatus()) ? "checkout-success" : "checkout-error";
+        } catch (StripeException ex) {
+            return "checkout-error";
+        }
     }
 }
