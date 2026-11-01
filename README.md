@@ -87,6 +87,15 @@ The Render blueprint in `render.yaml` provisions a PostgreSQL database and runs 
 
 The Render service should deploy from `main` after the pull request has been reviewed, CI passes, and the change is merged. Confirm the generated database host, port, database name, user and password are available to the web service.
 
+
+## Run the full stack with Docker Compose
+
+Set `APP_ADMIN_PASSWORD` in your shell, then run:
+
+    docker compose up --build
+
+Open http://localhost:8080. Docker Compose starts PostgreSQL and the Spring Boot application together. The Compose database password default is for local development only; set `POSTGRES_PASSWORD` to a strong value before exposing the database outside your machine. Stripe checkout remains disabled until Stripe keys and the webhook secret are configured.
+
 ## Build and test
 
     mvn --batch-mode clean verify
