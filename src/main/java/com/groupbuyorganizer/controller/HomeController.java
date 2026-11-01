@@ -1,10 +1,7 @@
 package com.groupbuyorganizer.controller;
 
 import com.groupbuyorganizer.model.GroupBuy;
-import com.groupbuyorganizer.model.User;
 import com.groupbuyorganizer.service.GroupBuyService;
-import com.groupbuyorganizer.service.UserService;
-import jakarta.validation.Valid;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
@@ -14,17 +11,15 @@ import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 
-import java.util.List;
+import jakarta.validation.Valid;
 
 @Controller
 public class HomeController {
 
     private final GroupBuyService groupBuyService;
-    private final UserService userService;
 
-    public HomeController(GroupBuyService groupBuyService, UserService userService) {
+    public HomeController(GroupBuyService groupBuyService) {
         this.groupBuyService = groupBuyService;
-        this.userService = userService;
     }
 
     @GetMapping("/")
@@ -47,7 +42,10 @@ public class HomeController {
             return "index";
         }
 
-        if (authentication != null && authentication.isAuthenticated()) {
+        if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getName())) {
+            groupBuy.setOrganizer("Guest");
+            groupBuy.setCreatedBy("Guest");
+        } else {
             String username = authentication.getName();
             groupBuy.setOrganizer(username);
             groupBuy.setCreatedBy(username);
