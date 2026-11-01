@@ -19,8 +19,9 @@ import org.springframework.security.web.SecurityFilterChain;
 public class SecurityConfig {
     @Bean
     public SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
-        http.authorizeHttpRequests(authorize -> authorize
-                .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/images/**", "/error").permitAll()
+        http.csrf(csrf -> csrf.ignoringRequestMatchers("/webhooks/stripe"))
+            .authorizeHttpRequests(authorize -> authorize
+                .requestMatchers("/", "/register", "/login", "/css/**", "/js/**", "/images/**", "/error", "/webhooks/stripe").permitAll()
                 .requestMatchers("/admin/**").hasRole("ADMIN")
                 .requestMatchers("/groups/**", "/checkout/**").authenticated()
                 .anyRequest().authenticated())
