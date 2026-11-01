@@ -30,6 +30,22 @@ services:
         sync: false
       - key: STRIPE_PUBLIC_KEY
         sync: false
+      - key: STRIPE_WEBHOOK_SECRET
+        sync: false
+      - key: STRIPE_CURRENCY
+        value: usd
+      - key: APP_ADMIN_USERNAME
+        value: admin
+      - key: APP_ADMIN_EMAIL
+        value: admin@example.com
+      - key: APP_ADMIN_PASSWORD
+        sync: false
+      - key: COOKIE_SECURE
+        value: true
+      - key: H2_CONSOLE_ENABLED
+        value: false
+      - key: DDL_AUTO
+        value: update
       - key: SPRING_PROFILES_ACTIVE
         value: prod
 
