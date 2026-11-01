@@ -36,6 +36,8 @@ public class HomeController {
         model.addAttribute("totalDealCount", allDeals.size());
         model.addAttribute("openDealCount", allDeals.stream().filter(d -> "Open".equalsIgnoreCase(d.getStatus())).count());
         model.addAttribute("readyDealCount", allDeals.stream().filter(d -> "Ready to Order".equalsIgnoreCase(d.getStatus())).count());
+        model.addAttribute("liveDealCount", allDeals.stream()
+                .filter(d -> !"Closed".equalsIgnoreCase(d.getStatus())).count());
         model.addAttribute("searchQuery", q == null ? "" : q);
         model.addAttribute("selectedStatus", status == null ? "" : status);
         if (authentication != null && authentication.isAuthenticated()
@@ -60,8 +62,9 @@ public class HomeController {
         groupBuy.setOrganizer(username);
         groupBuy.setCreatedBy(username);
         groupBuyService.save(groupBuy);
-        redirectAttributes.addFlashAttribute("message", "Deal created and added to deal history.");
-        return "redirect:/#history";
+        redirectAttributes.addFlashAttribute("message", "Deal created successfully! It is now visible in Live Deals and Deal History.");
+        redirectAttributes.addFlashAttribute("messageType", "success");
+        return "redirect:/#live-deals";
     }
 
     @PostMapping("/groups/{id}/join")
