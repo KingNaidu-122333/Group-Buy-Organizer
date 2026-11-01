@@ -77,7 +77,11 @@ public class HomeController {
     }
 
     private void populateHomeModel(Model model) {
-        model.addAttribute("dealHistory", groupBuyService.getDealHistory());
+        List<GroupBuy> allDeals = groupBuyService.getAllGroupBuys();
+        model.addAttribute("dealHistory", allDeals);
+        model.addAttribute("totalDealCount", allDeals.size());
+        model.addAttribute("openDealCount", allDeals.stream().filter(d -> "Open".equalsIgnoreCase(d.getStatus())).count());
+        model.addAttribute("readyDealCount", allDeals.stream().filter(d -> "Ready to Order".equalsIgnoreCase(d.getStatus())).count());
         if (!model.containsAttribute("groupBuy")) model.addAttribute("groupBuy", new GroupBuy());
     }
 }
