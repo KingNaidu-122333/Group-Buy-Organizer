@@ -126,7 +126,7 @@
                 <div class="progress-track" role="progressbar"
                      th:attr="aria-valuenow=${deal.currentMembers},aria-valuemin=0,aria-valuemax=${deal.targetMembers},aria-label='Deal membership progress'">
                     <div class="progress-fill"
-                         th:style="'width:' + ${T(java.lang.Math).min(100, (deal.currentMembers * 100.0 / deal.targetMembers))} + '%'"></div>
+                         th:style="${'width:' + T(java.lang.Math).min(100, (deal.currentMembers * 100.0 / deal.targetMembers)) + '%'}"></div>
                 </div>
                 <p class="progress-label" th:text="${deal.currentMembers + ' of ' + deal.targetMembers + ' members'}">0 members</p>
                 <div class="deal-actions">
