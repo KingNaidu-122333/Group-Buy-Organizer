@@ -79,8 +79,9 @@ public class CheckoutController {
         try {
             Session session = Session.retrieve(sessionId);
             if (!"paid".equalsIgnoreCase(session.getPaymentStatus())) return "checkout-error";
-            var payment = paymentService.recordPaidSession(session);
-            model.addAttribute("dealTitle", payment.getGroupBuy().getTitle());
+            paymentService.recordPaidSession(session);
+            Long dealId = Long.valueOf(session.getMetadata().get("groupBuyId"));
+            model.addAttribute("dealTitle", groupBuyService.getById(dealId).getTitle());
             return "checkout-success";
         } catch (StripeException | IllegalArgumentException | IllegalStateException ex) {
             return "checkout-error";
