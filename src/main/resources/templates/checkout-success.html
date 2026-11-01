@@ -10,7 +10,7 @@
 <main class="container success-shell">
     <section class="success-card">
         <h1>Payment confirmed</h1>
-        <p>Stripe has confirmed that your payment was successful.</p>
+        <p>Stripe has confirmed that your payment was successful for <strong th:text="${dealTitle}">your group deal</strong>.</p>
         <a class="primary-btn" th:href="@{/#deals}">Back to deals</a>
     </section>
 </main>
