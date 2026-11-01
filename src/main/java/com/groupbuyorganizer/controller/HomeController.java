@@ -31,7 +31,9 @@ public class HomeController {
                         Model model, Authentication authentication) {
         populateHomeModel(model);
         List<GroupBuy> allDeals = groupBuyService.getAllGroupBuys();
-        List<GroupBuy> deals = groupBuyService.searchDeals(q, status);
+        List<GroupBuy> deals = groupBuyService.searchDeals(q, status).stream()
+                .filter(deal -> !"Closed".equalsIgnoreCase(deal.getStatus()))
+                .toList();
         model.addAttribute("groupBuys", deals);
         model.addAttribute("totalDealCount", allDeals.size());
         model.addAttribute("openDealCount", allDeals.stream().filter(d -> "Open".equalsIgnoreCase(d.getStatus())).count());
@@ -76,7 +78,7 @@ public class HomeController {
         } catch (IllegalArgumentException | IllegalStateException ex) {
             redirectAttributes.addFlashAttribute("message", ex.getMessage());
         }
-        return "redirect:/#deals";
+        return "redirect:/#live-deals";
     }
 
     private void populateHomeModel(Model model) {
@@ -85,6 +87,8 @@ public class HomeController {
         model.addAttribute("totalDealCount", allDeals.size());
         model.addAttribute("openDealCount", allDeals.stream().filter(d -> "Open".equalsIgnoreCase(d.getStatus())).count());
         model.addAttribute("readyDealCount", allDeals.stream().filter(d -> "Ready to Order".equalsIgnoreCase(d.getStatus())).count());
+        model.addAttribute("liveDealCount", allDeals.stream()
+                .filter(d -> !"Closed".equalsIgnoreCase(d.getStatus())).count());
         if (!model.containsAttribute("groupBuy")) model.addAttribute("groupBuy", new GroupBuy());
     }
 }
