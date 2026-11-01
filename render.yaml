@@ -1,0 +1,7 @@
+services:
+  - type: web
+    name: group-buy-organizer
+    runtime: docker
+    plan: free
+    region: oregon
+    branch: main

@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Group Buy Organizer</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <header class="topbar">
+        <div class="container nav">
+            <div class="brand">Group Buy Organizer</div>
+            <a href="#form">Create a deal</a>
+        </div>
+    </header>
+
+    <main class="container">
+        <section class="hero">
+            <div>
+                <p class="eyebrow">Smart bulk buying</p>
+                <h1>Bring your community together for better deals.</h1>
+                <p class="lead">
+                    Launch a group buy, invite friends, and track progress until the order is ready.
+                </p>
+            </div>
+            <div class="hero-panel">
+                <div class="stat">
+                    <strong th:text="${#lists.size(groupBuys)}">0</strong>
+                    <span>Active group buys</span>
+                </div>
+                <div class="stat">
+                    <strong>24/7</strong>
+                    <span>Easy coordination</span>
+                </div>
+            </div>
+        </section>
+
+        <section id="form" class="form-card">
+            <h2>Create a group buy</h2>
+            <form th:action="@{/groups}" th:object="${groupBuy}" method="post">
+                <div class="grid">
+                    <label>
+                        <span>Title</span>
+                        <input type="text" th:field="*{title}" placeholder="Bulk coffee beans">
+                        <small th:if="${#fields.hasErrors('title')}" th:errors="*{title}">Title error</small>
+                    </label>
+
+                    <label>
+                        <span>Organizer</span>
+                        <input type="text" th:field="*{organizer}" placeholder="Jamie">
+                        <small th:if="${#fields.hasErrors('organizer')}" th:errors="*{organizer}">Organizer error</small>
+                    </label>
+
+                    <label>
+                        <span>Target members</span>
+                        <input type="number" min="2" th:field="*{targetMembers}">
+                        <small th:if="${#fields.hasErrors('targetMembers')}" th:errors="*{targetMembers}">Target error</small>
+                    </label>
+
+                    <label>
+                        <span>Current members</span>
+                        <input type="number" min="1" th:field="*{currentMembers}">
+                        <small th:if="${#fields.hasErrors('currentMembers')}" th:errors="*{currentMembers}">Current error</small>
+                    </label>
+
+                    <label>
+                        <span>Price per person</span>
+                        <input type="number" step="0.01" min="1" th:field="*{pricePerPerson}">
+                        <small th:if="${#fields.hasErrors('pricePerPerson')}" th:errors="*{pricePerPerson}">Price error</small>
+                    </label>
+
+                    <label class="full-width">
+                        <span>Description</span>
+                        <textarea th:field="*{description}" rows="3" placeholder="Describe the item, quantity, or shipping plan..."></textarea>
+                        <small th:if="${#fields.hasErrors('description')}" th:errors="*{description}">Description error</small>
+                    </label>
+                </div>
+
+                <button type="submit">Create Group Buy</button>
+            </form>
+        </section>
+
+        <section class="listing">
+            <div class="section-head">
+                <h2>Current deals</h2>
+            </div>
+
+            <div class="card-grid">
+                <article class="deal-card" th:each="groupBuy : ${groupBuys}">
+                    <div class="deal-header">
+                        <h3 th:text="${groupBuy.title}">Deal title</h3>
+                        <span class="badge" th:text="${groupBuy.status}">Open</span>
+                    </div>
+
+                    <p class="description" th:text="${groupBuy.description}">Description</p>
+
+                    <ul class="meta">
+                        <li><strong>Organizer:</strong> <span th:text="${groupBuy.organizer}">Name</span></li>
+                        <li><strong>Members:</strong> <span th:text="${groupBuy.currentMembers} + '/' + ${groupBuy.targetMembers}">0/0</span></li>
+                        <li><strong>Price:</strong> $<span th:text="${#numbers.formatDecimal(groupBuy.pricePerPerson, 1, 2)}">0.00</span> each</li>
+                    </ul>
+
+                    <form th:action="@{/groups/{id}/join(id=${groupBuy.id})}" method="post">
+                        <button type="submit" th:disabled="${groupBuy.status == 'Closed'}">Join group</button>
+                    </form>
+                </article>
+            </div>
+        </section>
+    </main>
+</body>
+</html>

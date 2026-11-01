@@ -1,0 +1,210 @@
+body {
+    margin: 0;
+    font-family: Arial, sans-serif;
+    background: linear-gradient(180deg, #f7f9fc 0%, #eef3ff 100%);
+    color: #1e293b;
+}
+
+* { box-sizing: border-box; }
+
+.container {
+    width: min(1100px, calc(100% - 32px));
+    margin: 0 auto;
+}
+
+.topbar {
+    background: #0f172a;
+    color: white;
+    padding: 18px 0;
+}
+
+.nav {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.brand {
+    font-size: 1.4rem;
+    font-weight: 700;
+}
+
+.nav a {
+    color: #bfdbfe;
+    text-decoration: none;
+}
+
+.hero {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
+    gap: 28px;
+    padding: 48px 0 24px;
+    align-items: center;
+}
+
+.eyebrow {
+    color: #4338ca;
+    text-transform: uppercase;
+    letter-spacing: 0.12em;
+    font-weight: 700;
+    font-size: 0.72rem;
+}
+
+.hero h1 {
+    font-size: clamp(2.2rem, 4vw, 4rem);
+    margin: 0 0 12px;
+    line-height: 1.05;
+}
+
+.lead {
+    font-size: 1.08rem;
+    color: #475569;
+    max-width: 60ch;
+}
+
+.hero-panel {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+    padding: 24px;
+    display: grid;
+    gap: 20px;
+}
+
+.stat {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    background: #eef2ff;
+    padding: 18px;
+    border-radius: 14px;
+}
+
+.stat strong {
+    font-size: 2rem;
+}
+
+.form-card, .deal-card {
+    background: white;
+    border-radius: 20px;
+    box-shadow: 0 18px 40px rgba(15, 23, 42, 0.08);
+}
+
+.form-card {
+    padding: 24px;
+    margin-bottom: 28px;
+}
+
+.grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 18px;
+}
+
+label {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    font-weight: 600;
+    font-size: 0.94rem;
+}
+
+.full-width {
+    grid-column: 1 / -1;
+}
+
+input, textarea, button {
+    font: inherit;
+}
+
+input, textarea {
+    border: 1px solid #dbe3f0;
+    border-radius: 10px;
+    padding: 12px 14px;
+    background: #f8fafc;
+}
+
+textarea {
+    resize: vertical;
+}
+
+label small {
+    color: #dc2626;
+    font-weight: 500;
+}
+
+button {
+    background: #4f46e5;
+    color: white;
+    border: none;
+    border-radius: 10px;
+    cursor: pointer;
+    padding: 11px 18px;
+    font-weight: 700;
+    margin-top: 18px;
+}
+
+button:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+.section-head {
+    margin: 12px 0 20px;
+}
+
+.card-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    padding-bottom: 40px;
+}
+
+.deal-card {
+    padding: 20px;
+}
+
+.deal-header {
+    display: flex;
+    justify-content: space-between;
+    gap: 12px;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.deal-header h3 {
+    margin: 0;
+}
+
+.badge {
+    background: #dbeafe;
+    color: #1d4ed8;
+    padding: 6px 10px;
+    border-radius: 999px;
+    font-size: 0.8rem;
+    font-weight: 700;
+}
+
+.description {
+    color: #475569;
+    margin: 0 0 14px;
+}
+
+.meta {
+    list-style: none;
+    padding: 0;
+    margin: 0 0 12px;
+    display: grid;
+    gap: 8px;
+    color: #334155;
+}
+
+@media (max-width: 720px) {
+    .hero {
+        grid-template-columns: 1fr;
+    }
+
+    .grid {
+        grid-template-columns: 1fr;
+    }
+}
