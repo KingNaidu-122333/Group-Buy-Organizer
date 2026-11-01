@@ -2,9 +2,13 @@ name: Java CI
 
 on:
   push:
-    branches: [ main, fix/navigation-auth-redirects ]
+    branches: [ main ]
   pull_request:
     branches: [ main ]
+
+concurrency:
+  group: java-ci-${{ github.event.pull_request.number || github.ref }}
+  cancel-in-progress: true
 
 jobs:
   test:
