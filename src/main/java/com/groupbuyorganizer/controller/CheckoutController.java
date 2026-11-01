@@ -2,11 +2,13 @@ package com.groupbuyorganizer.controller;
 
 import com.groupbuyorganizer.model.GroupBuy;
 import com.groupbuyorganizer.service.GroupBuyService;
+import com.groupbuyorganizer.service.PaymentService;
 import com.stripe.Stripe;
 import com.stripe.exception.StripeException;
 import com.stripe.model.checkout.Session;
 import com.stripe.param.checkout.SessionCreateParams;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -17,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller
 public class CheckoutController {
     private final GroupBuyService groupBuyService;
+    private final PaymentService paymentService;
 
     @Value("${stripe.secret.key:}")
     private String stripeSecretKey;
@@ -27,14 +30,16 @@ public class CheckoutController {
     @Value("${app.url:http://localhost:8080}")
     private String appUrl;
 
-    public CheckoutController(GroupBuyService groupBuyService) {
+    public CheckoutController(GroupBuyService groupBuyService, PaymentService paymentService) {
         this.groupBuyService = groupBuyService;
+        this.paymentService = paymentService;
     }
 
     @PostMapping("/checkout/{id}")
-    public String createCheckout(@PathVariable Long id) {
+    public String createCheckout(@PathVariable Long id, Authentication authentication) {
         GroupBuy deal = groupBuyService.getById(id);
         if (!"Ready to Order".equalsIgnoreCase(deal.getStatus())) return "redirect:/#deals";
+        if (!groupBuyService.isMember(id, authentication.getName())) return "checkout-error";
         if (stripeSecretKey == null || stripeSecretKey.isBlank()) return "checkout-error";
         if (deal.getPricePerPerson() == null || deal.getPricePerPerson() <= 0) return "checkout-error";
 
@@ -45,6 +50,7 @@ public class CheckoutController {
                     .setSuccessUrl(appUrl + "/checkout/success?session_id={CHECKOUT_SESSION_ID}")
                     .setCancelUrl(appUrl + "/#deals")
                     .putMetadata("groupBuyId", String.valueOf(deal.getId()))
+                    .putMetadata("buyerUsername", authentication.getName())
                     .addLineItem(SessionCreateParams.LineItem.builder().setQuantity(1L)
                             .setPriceData(SessionCreateParams.LineItem.PriceData.builder()
                                     .setCurrency(stripeCurrency.toLowerCase())
@@ -71,23 +77,11 @@ public class CheckoutController {
         Stripe.apiKey = stripeSecretKey;
         try {
             Session session = Session.retrieve(sessionId);
-            if (!"paid".equalsIgnoreCase(session.getPaymentStatus())
-                    || session.getMetadata() == null
-                    || session.getMetadata().get("groupBuyId") == null) {
-                return "checkout-error";
-            }
-
-            Long groupBuyId = Long.valueOf(session.getMetadata().get("groupBuyId"));
-            GroupBuy deal = groupBuyService.getById(groupBuyId);
-            long expectedAmount = Math.round(deal.getPricePerPerson() * 100);
-            if (session.getAmountTotal() == null || session.getAmountTotal() != expectedAmount
-                    || !stripeCurrency.equalsIgnoreCase(session.getCurrency())) {
-                return "checkout-error";
-            }
-
-            model.addAttribute("dealTitle", deal.getTitle());
+            if (!"paid".equalsIgnoreCase(session.getPaymentStatus())) return "checkout-error";
+            var payment = paymentService.recordPaidSession(session);
+            model.addAttribute("dealTitle", payment.getGroupBuy().getTitle());
             return "checkout-success";
-        } catch (StripeException | IllegalArgumentException ex) {
+        } catch (StripeException | IllegalArgumentException | IllegalStateException ex) {
             return "checkout-error";
         }
     }
