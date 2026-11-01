@@ -17,6 +17,7 @@ public class MyDealsController {
     @GetMapping("/my-deals")
     public String myDeals(Authentication authentication, Model model) {
         model.addAttribute("groupBuys", groupBuyService.getDealsCreatedBy(authentication.getName()));
+        model.addAttribute("joinedDeals", groupBuyService.getDealsJoinedBy(authentication.getName()));
         return "my-deals";
     }
 }
