@@ -4,6 +4,7 @@ import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.Size;
+import jakarta.validation.constraints.Pattern;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -19,6 +20,7 @@ public class User implements UserDetails {
 
     @NotBlank(message = "Username is required")
     @Size(min = 3, max = 40, message = "Username must be between 3 and 40 characters")
+    @Pattern(regexp = "^[a-zA-Z0-9_.-]+$", message = "Username may contain letters, numbers, dots, underscores and hyphens only")
     @Column(unique = true, nullable = false, length = 40)
     private String username;
 
