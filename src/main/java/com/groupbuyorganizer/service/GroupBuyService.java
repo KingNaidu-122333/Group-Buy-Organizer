@@ -54,6 +54,12 @@ public class GroupBuyService {
     }
 
     @Transactional(readOnly = true)
+    public List<GroupBuy> getDealsJoinedBy(String username) {
+        return membershipRepository.findAllByUser_UsernameOrderByJoinedAtDesc(username)
+                .stream().map(com.groupbuyorganizer.model.GroupBuyMembership::getGroupBuy).toList();
+    }
+
+    @Transactional(readOnly = true)
     public List<GroupBuy> getDealsCreatedBy(String username) {
         return repository.findAllByCreatedByOrderByCreatedAtDesc(username);
     }
