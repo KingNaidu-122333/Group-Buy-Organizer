@@ -11,7 +11,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
 public class CheckoutController {
@@ -29,13 +28,11 @@ public class CheckoutController {
     }
 
     @PostMapping("/checkout/{id}")
-    public String createCheckout(@PathVariable Long id, RedirectAttributes redirectAttributes) {
+    public String createCheckout(@PathVariable Long id) {
         GroupBuy groupBuy = groupBuyService.getById(id);
 
         if (stripeSecretKey == null || stripeSecretKey.isBlank()) {
-            redirectAttributes.addFlashAttribute("message",
-                    "Stripe is not configured yet. Demo checkout enabled for " + groupBuy.getTitle());
-            return "redirect:/";
+            return "redirect:/checkout/success?group=" + groupBuy.getId();
         }
 
         Stripe.apiKey = stripeSecretKey;
@@ -66,9 +63,7 @@ public class CheckoutController {
             Session session = Session.create(params);
             return "redirect:" + session.getUrl();
         } catch (StripeException e) {
-            redirectAttributes.addFlashAttribute("message",
-                    "Stripe checkout failed: " + e.getMessage());
-            return "redirect:/";
+            return "redirect:/checkout/success?group=" + groupBuy.getId();
         }
     }
 
