@@ -4,4 +4,6 @@
 /.vscode/
 *.iml
 *.class
+*.log
 .DS_Store
+.env

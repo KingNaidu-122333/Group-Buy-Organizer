@@ -1,0 +1,34 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login • Group Buy Organizer</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="auth-body">
+    <main class="auth-shell">
+        <section class="auth-card">
+            <h1>Welcome back</h1>
+            <p>Sign in to join or manage group buys</p>
+
+            <div th:if="${param.registered}" class="success-banner">Registration successful! Please sign in.</div>
+            <div th:if="${param.logout}" class="success-banner">You have been logged out.</div>
+
+            <form th:action="@{/login}" method="post">
+                <label>
+                    <span>Username</span>
+                    <input type="text" name="username" placeholder="username" required>
+                </label>
+                <label>
+                    <span>Password</span>
+                    <input type="password" name="password" placeholder="password" required>
+                </label>
+                <button type="submit" class="auth-btn">Sign in</button>
+            </form>
+
+            <p class="auth-link">Need an account? <a th:href="@{/register}">Create one</a></p>
+        </section>
+    </main>
+</body>
+</html>

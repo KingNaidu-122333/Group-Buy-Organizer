@@ -19,6 +19,11 @@ public class GroupBuyService {
         return repository.findAll();
     }
 
+    public GroupBuy getById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new IllegalArgumentException("Group buy not found: " + id));
+    }
+
     public GroupBuy save(GroupBuy groupBuy) {
         if (groupBuy.getCurrentMembers() == null) {
             groupBuy.setCurrentMembers(1);
@@ -30,9 +35,7 @@ public class GroupBuyService {
     }
 
     public GroupBuy joinGroup(Long id) {
-        GroupBuy groupBuy = repository.findById(id)
-                .orElseThrow(() -> new IllegalArgumentException("Group buy not found: " + id));
-
+        GroupBuy groupBuy = getById(id);
         int current = groupBuy.getCurrentMembers();
         int target = groupBuy.getTargetMembers();
 
@@ -45,6 +48,12 @@ public class GroupBuyService {
             }
         }
 
+        return repository.save(groupBuy);
+    }
+
+    public GroupBuy closeGroup(Long id) {
+        GroupBuy groupBuy = getById(id);
+        groupBuy.setStatus("Closed");
         return repository.save(groupBuy);
     }
 }

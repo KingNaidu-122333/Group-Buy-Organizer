@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Register • Group Buy Organizer</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body class="auth-body">
+    <main class="auth-shell">
+        <section class="auth-card">
+            <h1>Create your account</h1>
+            <p>Join the marketplace for better bulk pricing</p>
+
+            <div th:if="${errorMessage}" class="error-banner" th:text="${errorMessage}"></div>
+
+            <form th:action="@{/register}" th:object="${user}" method="post">
+                <label>
+                    <span>Username</span>
+                    <input type="text" th:field="*{username}" required>
+                </label>
+                <label>
+                    <span>Email</span>
+                    <input type="email" th:field="*{email}" required>
+                </label>
+                <label>
+                    <span>Password</span>
+                    <input type="password" th:field="*{password}" required>
+                </label>
+                <button type="submit" class="auth-btn">Register</button>
+            </form>
+
+            <p class="auth-link">Already have an account? <a th:href="@{/login}">Sign in</a></p>
+        </section>
+    </main>
+</body>
+</html>

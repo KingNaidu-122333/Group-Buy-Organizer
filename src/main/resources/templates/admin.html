@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en" xmlns:th="http://www.thymeleaf.org">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard • Group Buy Organizer</title>
+    <link rel="stylesheet" th:href="@{/css/styles.css}">
+</head>
+<body>
+    <header class="topbar">
+        <div class="container nav">
+            <div class="brand">Admin Dashboard</div>
+            <nav>
+                <a th:href="@{/}">Home</a>
+                <a th:href="@{/logout}" onclick="event.preventDefault(); document.getElementById('logoutForm').submit();">Logout</a>
+                <form id="logoutForm" th:action="@{/logout}" method="post" style="display:none;"></form>
+            </nav>
+        </div>
+    </header>
+
+    <main class="container dashboard-shell">
+        <section class="dashboard-overview">
+            <div class="stat-lg">
+                <strong th:text="${#lists.size(groupBuys)}">0</strong>
+                <span>Total deals</span>
+            </div>
+            <div class="stat-lg">
+                <strong>Admin</strong>
+                <span>Role access</span>
+            </div>
+        </section>
+
+        <section class="table-card">
+            <h2>Group buy overview</h2>
+            <table>
+                <thead>
+                <tr>
+                    <th>Title</th>
+                    <th>Organizer</th>
+                    <th>Status</th>
+                    <th>Members</th>
+                    <th>Action</th>
+                </tr>
+                </thead>
+                <tbody>
+                <tr th:each="deal : ${groupBuys}">
+                    <td th:text="${deal.title}">Deal</td>
+                    <td th:text="${deal.organizer}">Organizer</td>
+                    <td th:text="${deal.status}">Open</td>
+                    <td th:text="${deal.currentMembers} + '/' + ${deal.targetMembers}">0/0</td>
+                    <td>
+                        <form th:action="@{/admin/groups/{id}/close(id=${deal.id})}" method="post">
+                            <button type="submit" class="table-btn">Close</button>
+                        </form>
+                    </td>
+                </tr>
+                </tbody>
+            </table>
+        </section>
+    </main>
+</body>
+</html>

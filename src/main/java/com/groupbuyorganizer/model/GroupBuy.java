@@ -1,12 +1,11 @@
 package com.groupbuyorganizer.model;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
+import jakarta.persistence.*;
 import jakarta.validation.constraints.Min;
 import jakarta.validation.constraints.NotBlank;
 import jakarta.validation.constraints.NotNull;
+
+import java.time.LocalDateTime;
 
 @Entity
 public class GroupBuy {
@@ -24,6 +23,9 @@ public class GroupBuy {
     @NotBlank(message = "Organizer name is required")
     private String organizer;
 
+    @NotBlank(message = "Created by is required")
+    private String createdBy;
+
     @NotNull(message = "Target members is required")
     @Min(value = 2, message = "Target members must be at least 2")
     private Integer targetMembers;
@@ -38,15 +40,18 @@ public class GroupBuy {
 
     private String status = "Open";
 
+    @Column(nullable = false)
+    private LocalDateTime createdAt = LocalDateTime.now();
+
     public GroupBuy() {
     }
 
-    public GroupBuy(String title, String description, String organizer,
-                   Integer targetMembers, Integer currentMembers,
-                   Double pricePerPerson, String status) {
+    public GroupBuy(String title, String description, String organizer, String createdBy,
+                   Integer targetMembers, Integer currentMembers, Double pricePerPerson, String status) {
         this.title = title;
         this.description = description;
         this.organizer = organizer;
+        this.createdBy = createdBy;
         this.targetMembers = targetMembers;
         this.currentMembers = currentMembers;
         this.pricePerPerson = pricePerPerson;
@@ -85,6 +90,14 @@ public class GroupBuy {
         this.organizer = organizer;
     }
 
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
     public Integer getTargetMembers() {
         return targetMembers;
     }
@@ -115,5 +128,13 @@ public class GroupBuy {
 
     public void setStatus(String status) {
         this.status = status;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 }
