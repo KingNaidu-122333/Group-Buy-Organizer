@@ -24,8 +24,12 @@ public class HomeController {
                         @RequestParam(required = false) String status,
                         Model model, Authentication authentication) {
         populateHomeModel(model);
+        List<GroupBuy> allDeals = groupBuyService.getAllGroupBuys();
         List<GroupBuy> deals = groupBuyService.searchDeals(q, status);
         model.addAttribute("groupBuys", deals);
+        model.addAttribute("totalDealCount", allDeals.size());
+        model.addAttribute("openDealCount", allDeals.stream().filter(d -> "Open".equalsIgnoreCase(d.getStatus())).count());
+        model.addAttribute("readyDealCount", allDeals.stream().filter(d -> "Ready to Order".equalsIgnoreCase(d.getStatus())).count());
         model.addAttribute("searchQuery", q == null ? "" : q);
         model.addAttribute("selectedStatus", status == null ? "" : status);
         if (authentication != null && authentication.isAuthenticated()
