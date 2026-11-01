@@ -7,31 +7,33 @@
     <link rel="stylesheet" th:href="@{/css/styles.css}">
 </head>
 <body class="auth-body">
-    <main class="auth-shell">
-        <section class="auth-card">
-            <h1>Create your account</h1>
-            <p>Join the marketplace for better bulk pricing</p>
-
-            <div th:if="${errorMessage}" class="error-banner" th:text="${errorMessage}"></div>
-
-            <form th:action="@{/register}" th:object="${user}" method="post">
-                <label>
-                    <span>Username</span>
-                    <input type="text" th:field="*{username}" required>
-                </label>
-                <label>
-                    <span>Email</span>
-                    <input type="email" th:field="*{email}" required>
-                </label>
-                <label>
-                    <span>Password</span>
-                    <input type="password" th:field="*{password}" required>
-                </label>
-                <button type="submit" class="auth-btn">Register</button>
-            </form>
-
-            <p class="auth-link">Already have an account? <a th:href="@{/login}">Sign in</a></p>
-        </section>
-    </main>
+<main class="auth-shell">
+    <section class="auth-card">
+        <h1>Create your account</h1>
+        <p>Join the marketplace for better bulk pricing</p>
+        <div th:if="${errorMessage}" class="error-banner" th:text="${errorMessage}" role="alert"></div>
+        <form th:action="@{/register}" th:object="${user}" method="post">
+            <label>
+                <span>Username</span>
+                <input type="text" th:field="*{username}" autocomplete="username" required>
+                <small th:if="${#fields.hasErrors('username')}" th:errors="*{username}"></small>
+            </label>
+            <label>
+                <span>Email</span>
+                <input type="email" th:field="*{email}" autocomplete="email" required>
+                <small th:if="${#fields.hasErrors('email')}" th:errors="*{email}"></small>
+            </label>
+            <label>
+                <span>Password</span>
+                <input type="password" th:field="*{password}" autocomplete="new-password" minlength="8" required>
+                <small>Use at least 8 characters.</small>
+                <small th:if="${#fields.hasErrors('password')}" th:errors="*{password}"></small>
+            </label>
+            <button type="submit" class="auth-btn">Register</button>
+        </form>
+        <p class="auth-link">Already have an account? <a th:href="@{/login}">Sign in</a></p>
+        <p class="auth-link"><a th:href="@{/}">Back to home</a></p>
+    </section>
+</main>
 </body>
 </html>
