@@ -9,9 +9,9 @@
 <body>
 <header class="topbar">
     <div class="container nav">
-        <a class="brand" th:href="@{/admin}">Admin Dashboard</a>
-        <nav>
-            <a th:href="@{/}">Home</a>
+        <a class="brand" th:href="@{/admin}">Group Buy Organizer · Admin</a>
+        <nav aria-label="Admin navigation">
+            <a th:href="@{/}">View marketplace</a>
             <form th:action="@{/logout}" method="post" class="inline-form">
                 <button type="submit" class="nav-link-button">Logout</button>
             </form>
@@ -19,34 +19,42 @@
     </div>
 </header>
 <main class="container dashboard-shell">
-    <section class="dashboard-overview">
-        <div class="stat-lg">
-            <strong th:text="${#lists.size(groupBuys)}">0</strong>
-            <span>Total deals</span>
-        </div>
-        <div class="stat-lg"><strong>Admin</strong><span>Role access</span></div>
+    <section class="section-head">
+        <p class="eyebrow">Platform overview</p>
+        <h1>Admin dashboard</h1>
+        <p>Monitor all group deals and manage their availability.</p>
     </section>
-    <div th:if="${message}" class="flash-message" th:text="${message}"></div>
+    <div class="dashboard-overview">
+        <div class="stat-lg"><strong th:text="${totalDeals}">0</strong><span>Total deals</span></div>
+        <div class="stat-lg"><strong th:text="${openDeals}">0</strong><span>Open</span></div>
+        <div class="stat-lg"><strong th:text="${readyDeals}">0</strong><span>Ready to order</span></div>
+        <div class="stat-lg"><strong th:text="${closedDeals}">0</strong><span>Closed</span></div>
+    </div>
+    <div th:if="${message}" class="flash-message" role="status" th:text="${message}"></div>
     <section class="table-card">
-        <h2>Group buy overview</h2>
-        <table>
-            <thead><tr><th>Title</th><th>Organizer</th><th>Status</th><th>Members</th><th>Action</th></tr></thead>
-            <tbody>
-            <tr th:each="deal : ${groupBuys}">
-                <td th:text="${deal.title}">Deal</td>
-                <td th:text="${deal.organizer}">Organizer</td>
-                <td th:text="${deal.status}">Open</td>
-                <td th:text="${deal.currentMembers + '/' + deal.targetMembers}">0/0</td>
-                <td>
-                    <form th:if="${deal.status != 'Closed'}"
-                          th:action="@{/admin/groups/{id}/close(id=${deal.id})}" method="post">
-                        <button type="submit" class="table-btn">Close</button>
-                    </form>
-                    <span th:if="${deal.status == 'Closed'}">Closed</span>
-                </td>
-            </tr>
-            </tbody>
-        </table>
+        <h2>Manage group deals</h2>
+        <div class="table-scroll">
+            <table>
+                <thead><tr><th>Deal</th><th>Organizer</th><th>Created</th><th>Members</th><th>Status</th><th>Action</th></tr></thead>
+                <tbody>
+                <tr th:each="deal : ${groupBuys}">
+                    <td><strong th:text="${deal.title}">Deal</strong></td>
+                    <td th:text="${deal.organizer}">Organizer</td>
+                    <td th:text="${#temporals.format(deal.createdAt, 'dd MMM yyyy')}">Date</td>
+                    <td th:text="${deal.currentMembers + '/' + deal.targetMembers}">0/0</td>
+                    <td><span class="badge" th:text="${deal.status}">Open</span></td>
+                    <td>
+                        <form th:if="${deal.status != 'Closed'}"
+                              th:action="@{/admin/groups/{id}/close(id=${deal.id})}" method="post">
+                            <button type="submit" class="table-btn">Close deal</button>
+                        </form>
+                        <span th:if="${deal.status == 'Closed'}" class="muted">Already closed</span>
+                    </td>
+                </tr>
+                <tr th:if="${#lists.isEmpty(groupBuys)}"><td colspan="6">No deals have been created.</td></tr>
+                </tbody>
+            </table>
+        </div>
     </section>
 </main>
 </body>
