@@ -55,7 +55,9 @@ public class HomeController {
                               Authentication authentication, RedirectAttributes redirectAttributes) {
         if (bindingResult.hasErrors()) {
             populateHomeModel(model);
-            model.addAttribute("groupBuys", groupBuyService.getAllGroupBuys());
+            model.addAttribute("groupBuys", groupBuyService.getAllGroupBuys().stream()
+                    .filter(deal -> !"Closed".equalsIgnoreCase(deal.getStatus()))
+                    .toList());
             model.addAttribute("searchQuery", "");
             model.addAttribute("selectedStatus", "");
             return "index";
