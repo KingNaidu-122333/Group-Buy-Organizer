@@ -10,6 +10,7 @@ import com.groupbuyorganizer.repository.UserRepository;
 import com.stripe.model.checkout.Session;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
+import java.util.List;
 import org.springframework.transaction.annotation.Transactional;
 
 @Service
@@ -30,6 +31,11 @@ public class PaymentService {
         this.groupBuyRepository = groupBuyRepository;
         this.membershipRepository = membershipRepository;
         this.userRepository = userRepository;
+    }
+
+    @Transactional(readOnly = true)
+    public List<Payment> getPaymentHistory() {
+        return paymentRepository.findAllByOrderByPaidAtDesc();
     }
 
     @Transactional(readOnly = true)
