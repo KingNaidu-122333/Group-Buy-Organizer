@@ -47,6 +47,13 @@ public class GroupBuyService {
     }
 
     @Transactional(readOnly = true)
+    public boolean isMember(Long groupBuyId, String username) {
+        User user = userRepository.findByUsername(username)
+                .orElseThrow(() -> new IllegalArgumentException("User account not found."));
+        return membershipRepository.existsByGroupBuy_IdAndUser_Id(groupBuyId, user.getId());
+    }
+
+    @Transactional(readOnly = true)
     public List<GroupBuy> getDealsCreatedBy(String username) {
         return repository.findAllByCreatedByOrderByCreatedAtDesc(username);
     }
